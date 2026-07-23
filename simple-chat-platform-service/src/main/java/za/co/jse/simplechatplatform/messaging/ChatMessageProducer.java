@@ -2,6 +2,7 @@ package za.co.jse.simplechatplatform.messaging;
 
 import org.springframework.stereotype.Component;
 import za.co.jse.simplechatplatform.domain.ChatMessage;
+import za.co.jse.simplechatplatform.exception.MessageQueueFullException;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,7 +26,7 @@ public class ChatMessageProducer implements ChatMessageQueue {
     public void publish(ChatMessage message) {
         try {
             boolean accepted = queue.offer(message, OFFER_TIMEOUT, TimeUnit.MILLISECONDS);
-            if (!accepted) throw new IllegalStateException("Message queue is full, please try again shortly");
+            if (!accepted) throw new MessageQueueFullException("Message queue is full, please try again shortly");
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

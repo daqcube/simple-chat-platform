@@ -95,43 +95,47 @@ protocol.
 
 # Running the Application
 
-## Start Backend
+## Backend
 
-```bash
-cd simple-chat-platform-service
-```
+See the backend documentation:
 
-Follow:
-
-```text
-simple-chat-platform-service/README.md
-```
+[Simple Chat Platform Service README](./simple-chat-platform-service/README.md)
 
 ---
 
-## Start Frontend
+## Frontend
 
-```bash
-cd simple-chat-platform-ui
-```
+See the frontend documentation:
 
-Follow:
-
-```text
-simple-chat-platform-ui/README.md
-```
+[Simple Chat Platform UI README](./simple-chat-platform-ui/README.md)
 
 ---
 
 # Application Flow
 
-1. User enters a username and room ID.
-2. Frontend sends a request to join a chat room.
-3. Backend creates the room if it does not exist.
-4. A WebSocket/STOMP connection is established.
-5. User subscribes to the room topic.
-6. Messages are exchanged in real time.
-7. Backend broadcasts messages to connected users.
-8. Leave events are broadcast when users exit.
+1. User enters a username.
 
+2. Frontend validates that the username is provided.
+
+3. Frontend establishes a WebSocket/STOMP connection.
+
+4. Frontend selects the default chat room (`general`).
+
+5. Frontend sends a REST request to join the default room.
+
+6. Backend validates that the default room exists.
+
+7. Backend adds the user to the room membership.
+
+8. Backend publishes a JOIN event.
+
+9. Backend broadcasts the JOIN event to users subscribed to the room.
+
+10. Users exchange messages through WebSocket/STOMP.
+
+11. Backend broadcasts messages to all users subscribed to the room.
+
+12. When a user leaves, backend removes the user from the room.
+
+13. Backend broadcasts a LEAVE event.
 ---

@@ -2,6 +2,7 @@ package za.co.jse.simplechatplatform.messaging;
 
 import org.junit.jupiter.api.Test;
 import za.co.jse.simplechatplatform.domain.ChatMessage;
+import za.co.jse.simplechatplatform.exception.MessageQueueFullException;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +68,7 @@ class ChatMessageProducerTest {
                 .thenReturn(false);
 
         //SUT
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> messageProducer.publish(message));
+        MessageQueueFullException exception = assertThrows(MessageQueueFullException.class, () -> messageProducer.publish(message));
 
         //Assertions
         assertEquals("Message queue is full, please try again shortly", exception.getMessage());
