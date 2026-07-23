@@ -1,0 +1,63 @@
+<div class="users">
+
+  <div class="users-header">
+
+    <h5>
+      Members
+    </h5>
+
+    <span class="count">
+      {{ users().length }}
+    </span>
+
+  </div>
+
+
+  <div class="user-list">
+
+    @for (user of users(); track user) {
+
+      <div class="user-item">
+
+
+        <div class="avatar">
+
+          {{ user.charAt(0).toUpperCase() }}
+
+        </div>
+
+
+        <div class="user-details">
+
+          <div class="username">
+            {{ user }}
+          </div>
+
+
+          <div class="status">
+
+            <span class="online"></span>
+
+            Online
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+    } @empty {
+
+      <div class="empty">
+
+        No users online
+
+      </div>
+
+    }
+
+  </div>
+
+</div>

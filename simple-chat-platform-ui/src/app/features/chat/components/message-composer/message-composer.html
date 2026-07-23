@@ -1,0 +1,22 @@
+<form
+  class="composer"
+  (ngSubmit)="submit()">
+
+  <input
+    id="message"
+    name="message"
+    type="text"
+    class="message-input"
+    placeholder="Type a message..."
+    [value]="message()"
+    (input)="updateMessage($any($event.target).value)"
+  />
+
+  <button
+    type="submit"
+    class="send-button">
+    Send
+  </button>
+
+
+</form>

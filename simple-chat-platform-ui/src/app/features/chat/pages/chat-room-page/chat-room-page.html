@@ -1,0 +1,39 @@
+@if (room(); as room) {
+
+  <div class="room">
+
+    <header class="room-header">
+
+      <div>
+        <h3>{{ room.name }}</h3>
+
+        <small>
+          {{ users().length }} users online
+        </small>
+      </div>
+
+    </header>
+
+    <section class="room-messages">
+
+      <app-message-list [messages]="messages()"/>
+
+    </section>
+
+    <footer class="room-footer">
+
+      <app-message-composer [room]="room" [username]="username()"
+                            (send)="onSend($event)"/>
+
+    </footer>
+
+  </div>
+
+} @else {
+
+  <div class="empty-room">
+    <h3>Select a room</h3>
+    <p>Choose a room from the list to begin chatting.</p>
+  </div>
+
+}

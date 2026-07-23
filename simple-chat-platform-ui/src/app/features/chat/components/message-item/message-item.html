@@ -1,0 +1,28 @@
+<div class="message-item">
+
+  @if (showAvatar()) {
+    <div class="avatar">
+      {{ initials() }}
+    </div>
+  }
+
+  <div class="content">
+    <div class="meta">
+      @if (showAvatar()) {
+        <strong>
+          {{ message().username }}
+        </strong>
+      }
+      <small>
+        {{ message().timestamp | date:'shortTime' }}
+      </small>
+
+    </div>
+
+    <div class="bubble">
+      {{ message().content }}
+    </div>
+  </div>
+
+
+</div>

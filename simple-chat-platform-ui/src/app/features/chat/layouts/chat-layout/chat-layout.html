@@ -1,0 +1,27 @@
+<div class="chat-layout">
+
+  <aside class="sidebar">
+    <app-room-list/>
+  </aside>
+
+  <main class="conversation">
+    @if (chatState.activeRoom(); as room) {
+      <router-outlet></router-outlet>
+    } @else {
+      <div class="empty-state">
+        <h3>Welcome 👋</h3>
+        <p>Select a chat room to start chatting.</p>
+      </div>
+
+    }
+
+  </main>
+
+  <aside class="users">
+    @if (chatState.activeRoom(); as room) {
+      <app-room-users [roomId]="room.id"/>
+    }
+
+  </aside>
+
+</div>

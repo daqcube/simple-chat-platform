@@ -1,0 +1,17 @@
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: simple-chat-platform
+
+jse:
+  chat:
+    default-room: general
+  cors:
+    allowed-origin: http://localhost:4200
+
+logging:
+  level:
+    za.co.jse.simplechatplatform: INFO

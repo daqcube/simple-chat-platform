@@ -1,0 +1,36 @@
+<div class="room-list">
+
+  <div class="room-list-header">
+    <h5>Chat Rooms</h5>
+  </div>
+
+  @for (room of rooms(); track room.id) {
+
+    <button
+      class="room-card"
+      [class.active]="activeRoom()?.id === room.id"
+      (click)="select(room)">
+
+      <div class="room-info">
+
+        <div class="room-name">
+          {{ room.name }}
+        </div>
+
+      </div>
+
+      <div class="room-users">
+        {{ getUsers(room).length }}
+      </div>
+
+    </button>
+
+  } @empty {
+
+    <div class="empty">
+      No chat rooms available.
+    </div>
+
+  }
+
+</div>

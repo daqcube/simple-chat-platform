@@ -1,0 +1,65 @@
+<div class="join-page">
+  <div class="join-card">
+
+    <div class="header">
+      <h1>
+        Join Chat
+      </h1>
+
+      <p>
+        Enter your username to start chatting.
+      </p>
+    </div>
+
+
+    <form
+      (ngSubmit)="join()">
+
+
+      <div class="form-group">
+
+        <label for="username">
+          Username
+        </label>
+
+        <input
+          id="username"
+          type="text"
+          class="form-control"
+          placeholder="Enter username"
+          [value]="username()"
+          (input)="updateUsername($any($event.target).value)"
+        />
+
+
+      </div>
+
+
+
+      @if (error(); as message) {
+
+        <div class="error">
+
+          {{ message }}
+
+        </div>
+
+      }
+
+
+
+      <button
+        type="submit"
+        class="join-button">
+
+        Join Room
+
+      </button>
+
+
+    </form>
+
+
+  </div>
+
+</div>
