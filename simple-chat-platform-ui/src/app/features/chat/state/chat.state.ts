@@ -1,5 +1,6 @@
 import {computed, Injectable, signal} from '@angular/core';
-import {ChatMessageResponse, ChatRoom} from '../../../core/models/chat.model';
+import {ChatRoom} from '../../../core/models/chat-room.model';
+import {ChatMessageResponse} from '../../../core/models/chat-message-response.model';
 
 
 @Injectable({

@@ -1,13 +1,15 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {Client, StompSubscription} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import {ChatMessageRequest, ChatMessageResponse, ChatRoom} from '../models/chat.model';
 import {environment} from '../../../environments/environment';
 import {Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ChatState} from '../../features/chat/state/chat.state';
 import {JoinResponse} from '../models/join-response.model';
 import {JoinRequest} from '../models/join-request.model';
+import {ChatMessageResponse} from '../models/chat-message-response.model';
+import {ChatMessageRequest} from '../models/chat-message-request.model';
+import {ChatRoom} from '../models/chat-room.model';
 
 @Injectable({providedIn: 'root'})
 export class ChatService {
@@ -27,7 +29,7 @@ export class ChatService {
     if (this.client?.active) {
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.client = new Client({
         webSocketFactory: () =>
           new SockJS(environment.websocket.endpoint),

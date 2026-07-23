@@ -1,6 +1,6 @@
 import {AfterViewChecked, Component, ElementRef, input, ViewChild} from '@angular/core';
-import {ChatMessageResponse} from '../../../../core/models/chat.model';
 import {MessageItem} from '../message-item/message-item';
+import {ChatMessageResponse} from '../../../../core/models/chat-message-response.model';
 
 
 @Component({

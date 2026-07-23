@@ -3,7 +3,7 @@ import {MessageComposer} from '../../components/message-composer/message-compose
 import {MessageList} from '../../components/message-list/message-list';
 import {ChatState} from '../../state/chat.state';
 import {ChatService} from '../../../../core/services/chat.service';
-import {ChatMessageRequest} from '../../../../core/models/chat.model';
+import {ChatMessageRequest} from '../../../../core/models/chat-message-request.model';
 
 @Component({
   selector: 'app-chat-room',

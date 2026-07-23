@@ -1,15 +1,10 @@
-<div class="message-list">
-
+<div #scrollAnchor class="message-list">
   @for (message of messages(); track message) {
-
     <app-message-item [message]="message"/>
-
   } @empty {
-
     <div class="empty">
       No messages yet. Start the conversation.
     </div>
-
   }
 
 </div>

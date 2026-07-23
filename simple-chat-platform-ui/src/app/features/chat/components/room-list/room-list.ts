@@ -1,6 +1,6 @@
 import {Component, computed, inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {ChatRoom} from '../../../../core/models/chat.model';
+import {ChatRoom} from '../../../../core/models/chat-room.model';
 import {ChatState} from '../../state/chat.state';
 import {ChatService} from '../../../../core/services/chat.service';
 

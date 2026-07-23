@@ -1,6 +1,6 @@
 import {Component, computed, input} from '@angular/core';
-import {ChatMessageResponse, MessageType} from '../../../../core/models/chat.model';
 import {DatePipe} from '@angular/common';
+import {ChatMessageResponse, MessageType} from '../../../../core/models/chat-message-response.model';
 
 @Component({
   selector: 'app-message-item',

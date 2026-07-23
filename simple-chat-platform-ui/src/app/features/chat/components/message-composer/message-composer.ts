@@ -1,6 +1,7 @@
 import {Component, EventEmitter, input, Output, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {ChatMessageRequest, ChatRoom} from '../../../../core/models/chat.model';
+import {ChatRoom} from '../../../../core/models/chat-room.model';
+import {ChatMessageRequest} from '../../../../core/models/chat-message-request.model';
 
 @Component({
   selector: 'app-message-composer',
