@@ -1,75 +1,40 @@
 .message-item {
-
   display: flex;
-
   gap: .75rem;
-
   align-items: flex-start;
-
 }
-
 
 .avatar {
-
   width: 36px;
-
   height: 36px;
-
   border-radius: 50%;
-
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
-
   background: #0d6efd;
-
   color: white;
-
   font-weight: 600;
-
 }
-
 
 .content {
-
   max-width: 75%;
-
 }
-
 
 .meta {
-
   display: flex;
-
   align-items: center;
-
   gap: .5rem;
-
-
   margin-bottom: .25rem;
 
-
   strong {
-
     font-size: .9rem;
-
   }
-
 
   small {
-
     color: #6c757d;
-
     font-size: .75rem;
-
   }
-
 }
-
 
 .bubble {
   background: #f1f3f5;
