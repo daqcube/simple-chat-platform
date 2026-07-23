@@ -2,7 +2,7 @@ import {inject, Injectable, signal} from '@angular/core';
 import {Client, StompSubscription} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {environment} from '../../../environments/environment';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ChatState} from '../../features/chat/state/chat.state';
 import {JoinResponse} from '../models/join-response.model';
@@ -121,8 +121,7 @@ export class ChatService {
   }
 
 
-  leave(roomId: string, username: string): void {
-
+  leaveRoom(roomId: string, username: string): void {
     this.client?.publish({
 
       destination:
@@ -144,7 +143,6 @@ export class ChatService {
     }
   }
 
-
   disconnect(): void {
     this.client?.deactivate();
 
@@ -152,24 +150,8 @@ export class ChatService {
   }
 
   getRooms(): Observable<ChatRoom[]> {
-    return of([
-        {
-          id: 'general',
-          name: 'General',
-          onlineUsers: 0
-        },
-        {
-          id: 'java',
-          name: 'Java Developers',
-          onlineUsers: 0
-        },
-        {
-          id: 'spring',
-          name: 'Spring Boot',
-          onlineUsers: 0
-        }
-      ]
-    )
-      ;
+    return this.http.get<ChatRoom[]>(
+      `${environment.api.chat}/rooms`
+    );
   }
 }

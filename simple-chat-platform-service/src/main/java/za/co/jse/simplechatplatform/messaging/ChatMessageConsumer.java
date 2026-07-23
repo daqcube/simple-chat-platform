@@ -20,7 +20,6 @@ public class ChatMessageConsumer {
     private final ChatMessageQueue chatMessageQueue;
     private final ChatRoomBroadcaster broadcaster;
     private final ChatRoomService chatRoomService;
-
     private final AtomicBoolean running = new AtomicBoolean(true);
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
@@ -48,7 +47,6 @@ public class ChatMessageConsumer {
                     break;
                 }
             }
-
         });
 
     }

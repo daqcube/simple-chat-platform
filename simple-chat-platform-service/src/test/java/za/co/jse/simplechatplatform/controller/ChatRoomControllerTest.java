@@ -6,13 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import za.co.jse.simplechatplatform.dto.ChatRoomRequest;
+import za.co.jse.simplechatplatform.dto.ChatRoomResponse;
 import za.co.jse.simplechatplatform.dto.JoinResponse;
 import za.co.jse.simplechatplatform.service.ChatRoomService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,5 +54,26 @@ class ChatRoomControllerTest {
         assertSame(response, result.getBody());
 
         verify(chatRoomService).join(request);
+    }
+
+    @Test
+    void shouldReturnChatRooms() {
+        // Given
+        Set<ChatRoomResponse> rooms = Set.of(
+                new ChatRoomResponse("general", "General", 2),
+                new ChatRoomResponse("java", "Java Developers", 1)
+        );
+
+        when(chatRoomService.getRooms()).thenReturn(rooms);
+
+        // When
+        ResponseEntity<Set<ChatRoomResponse>> roomResponse = controller.getRooms();
+
+        // Then
+        assertNotNull(roomResponse);
+        assertEquals(HttpStatus.OK, roomResponse.getStatusCode());
+        assertEquals(rooms, roomResponse.getBody());
+
+        verify(chatRoomService).getRooms();
     }
 }

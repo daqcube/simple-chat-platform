@@ -1,5 +1,6 @@
 package za.co.jse.simplechatplatform.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import za.co.jse.simplechatplatform.mapper.ChatMessageMapper;
 import za.co.jse.simplechatplatform.messaging.ChatMessageProducer;
 
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +31,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Value("${jse.chat.default-room}")
     private String defaultRoom;
 
+    @PostConstruct
+    void initRooms() {
+        rooms.put("developers", new ChatRoomSession("developers", "Java Developers"));
+        rooms.put("spring", new ChatRoomSession("spring", "Spring Boot"));
+        rooms.put("general", new ChatRoomSession("general", "General"));
+    }
+
     public ChatRoomServiceImpl(ChatMessageProducer producer,
                                ChatMessageMapper mapper) {
         this.producer = producer;
@@ -38,7 +48,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public JoinResponse join(ChatRoomRequest request) {
         String roomId = Objects.isNull(request.roomId()) || request.roomId().isEmpty() ? defaultRoom : request.roomId();
 
-        ChatRoomSession room = rooms.computeIfAbsent(roomId, ChatRoomSession::new);
+        ChatRoomSession room = getRoomById(roomId);
+        if (Objects.isNull(room)) {
+            throw new IllegalArgumentException(String.format("Room %s does not exist ", request.roomId()));
+        }
         room.addUser(request.username());
 
         ChatMessage message = mapper.toJoinMessage(request.username(), room.getRoomId());
@@ -56,7 +69,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public void leave(ChatRoomRequest request) {
-        ChatRoomSession room = rooms.get(request.roomId());
+        ChatRoomSession room = getRoomById(request.roomId());
         if (Objects.isNull(room)) return;
 
         room.removeUser(request.username());
@@ -65,21 +78,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info("User with username {} LEFT room {}", request.username(), room.getRoomId());
     }
 
+    private ChatRoomSession getRoomById(String roomId) {
+        return rooms.get(roomId);
+    }
+
     @Override
     public Set<ChatRoomResponse> getRooms() {
         return rooms.values()
                 .stream()
                 .map(room -> new ChatRoomResponse(
                         room.getRoomId(),
-                        room.getUsers()
+                        room.getRoomName(),
+                        room.getUsers().size()
                 ))
-
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(ChatRoomResponse::name))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
     public Set<String> getRoomUsers(String roomId) {
-        ChatRoomSession room = rooms.get(roomId);
+        ChatRoomSession room = getRoomById(roomId);
         if (Objects.isNull(room)) {
             return Set.of();
         }

@@ -10,10 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class ChatRoomSession {
     private final String roomId;
+    private final String roomName;
     private final Set<String> users = ConcurrentHashMap.newKeySet();
 
-    public ChatRoomSession(String roomId) {
+    public ChatRoomSession(String roomId, String roomName) {
         this.roomId = roomId;
+        this.roomName = roomName;
     }
 
     public void addUser(String username) {

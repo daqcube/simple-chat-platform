@@ -30,7 +30,7 @@ export class RoomList {
 
     const previous = this.activeRoom();
     if (previous) {
-      this.chatService.leave(previous.id, this.chatState.username());
+      this.chatService.leaveRoom(previous.id, this.chatState.username());
       this.chatService.unsubscribeFromRoom(previous.id);
     }
 

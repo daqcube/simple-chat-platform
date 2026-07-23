@@ -38,6 +38,7 @@ class ChatRoomServiceImplTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(service, "defaultRoom", GENERAL_ROOM_ID);
+        ReflectionTestUtils.invokeMethod(service, "initRooms");
     }
 
     @Test
@@ -57,7 +58,7 @@ class ChatRoomServiceImplTest {
 
         assertTrue(service.getRooms()
                 .stream()
-                .anyMatch(room -> room.roomId().equals(roomId)));
+                .anyMatch(room -> room.id().equals(roomId)));
     }
 
 
@@ -67,7 +68,7 @@ class ChatRoomServiceImplTest {
         String username = "john";
         String roomId = "";
         ChatRoomRequest request = new ChatRoomRequest(roomId, username);
-        ChatMessage message = buildMessage( username, roomId);
+        ChatMessage message = buildMessage(username, roomId);
         //When
         when(mapper.toJoinMessage(username, GENERAL_ROOM_ID)).thenReturn(message);
 
@@ -102,14 +103,7 @@ class ChatRoomServiceImplTest {
         verify(producer).publish(message);
         assertTrue(service.getRooms()
                 .stream()
-                .anyMatch(room -> room.roomId().equals(roomId)));
-    }
-
-    @Test
-    void shouldReturnEmptyRoomsWhenNoRoomsExist() {
-        Set<ChatRoomResponse> rooms = service.getRooms();
-        assertNotNull(rooms);
-        assertTrue(rooms.isEmpty());
+                .anyMatch(room -> room.id().equals(roomId)));
     }
 
     @Test
@@ -131,21 +125,21 @@ class ChatRoomServiceImplTest {
         Set<ChatRoomResponse> rooms = service.getRooms();
 
         assertNotNull(rooms);
-        assertEquals(2, rooms.size());
+        assertEquals(3, rooms.size());
 
         ChatRoomResponse developersRoom = rooms.stream()
-                .filter(room -> room.roomId().equals(DEVELOPERS_ROOM_ID))
+                .filter(room -> room.id().equals(DEVELOPERS_ROOM_ID))
                 .findFirst()
                 .orElseThrow();
 
-        assertEquals(Set.of("john", "mary"), developersRoom.users());
+        assertEquals(2, developersRoom.onlineUsers());
 
         ChatRoomResponse generalRoom = rooms.stream()
-                .filter(room -> room.roomId().equals(GENERAL_ROOM_ID))
+                .filter(room -> room.id().equals(GENERAL_ROOM_ID))
                 .findFirst()
                 .orElseThrow();
 
-        assertEquals(Set.of("peter"), generalRoom.users());
+        assertEquals(1, generalRoom.onlineUsers());
     }
 
     @Test
@@ -229,6 +223,28 @@ class ChatRoomServiceImplTest {
         Set<String> users = service.getRoomUsers("unknown-room");
         assertNotNull(users);
         assertTrue(users.isEmpty());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenJoiningNonExistingRoom() {
+        // Given
+        ChatRoomRequest request = new ChatRoomRequest(
+                "unknown-room",
+                "john"
+        );
+
+        // When & Then
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.join(request)
+        );
+
+        assertEquals("Room unknown-room does not exist ",
+                exception.getMessage()
+        );
+
+        verifyNoInteractions(mapper);
+        verifyNoInteractions(producer);
     }
 
     private ChatMessage buildMessage(String username, String roomId) {

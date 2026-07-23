@@ -1,6 +1,6 @@
 <div class="chat-layout">
 
-  <aside class="sidebar">
+  <aside class="sidebar" aria-label="Chat rooms">
     <app-room-list/>
   </aside>
 
@@ -12,12 +12,10 @@
         <h3>Welcome 👋</h3>
         <p>Select a chat room to start chatting.</p>
       </div>
-
     }
-
   </main>
 
-  <aside class="users">
+  <aside class="users" aria-label="Chat room users">
     @if (chatState.activeRoom(); as room) {
       <app-room-users [roomId]="room.id"/>
     }
