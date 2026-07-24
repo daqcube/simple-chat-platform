@@ -19,6 +19,9 @@ simple-chat-platform
 |
 ├── README.md
 |
+├── postman
+|   └── simple-chat-platform.postman_collection.json
+|
 ├── simple-chat-platform-service
 |   ├── README.md
 |   ├── pom.xml
