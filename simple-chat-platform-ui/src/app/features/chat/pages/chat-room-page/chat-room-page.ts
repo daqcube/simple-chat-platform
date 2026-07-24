@@ -39,7 +39,6 @@ export class ChatRoomPage implements OnDestroy {
       this.chatService.subscribeToRoom(
         this.roomId()
       );
-
     });
 
   }

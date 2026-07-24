@@ -1,96 +1,46 @@
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, Injectable, signal, WritableSignal} from '@angular/core';
 import {ChatRoom} from '../../../core/models/chat-room.model';
 import {ChatMessageResponse} from '../../../core/models/chat-message-response.model';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatRoomState {
-  private readonly _username = signal<string>('');
-  private readonly _rooms = signal<ChatRoom[]>([]);
-  private readonly _activeRoom = signal<ChatRoom | null>(null);
+  private readonly _username = signal('');
+  private readonly _chatRooms = signal<ChatRoom[]>([]);
+  private readonly _activeChatRoom = signal<ChatRoom | null>(null);
 
-  private readonly _messages =
+  private readonly _chatMessages =
     signal<Record<string, ChatMessageResponse[]>>({});
 
-  private readonly _users =
+  private readonly _chatRoomUsers =
     signal<Record<string, string[]>>({});
 
-  readonly username = computed(() =>
-    this._username()
-  );
+  readonly username = computed(() => this._username());
+  readonly chatRooms = computed(() => this._chatRooms());
+  readonly activeRoom = computed(() => this._activeChatRoom());
 
-  readonly rooms = computed(() =>
-    this._rooms()
-  );
-
-  readonly activeRoom = computed(() =>
-    this._activeRoom()
-  );
-
-  readonly messages = computed(() =>
-    this._messages()
-  );
-
-  readonly users = computed(() =>
-    this._users()
-  );
-
-  setUsername(username: string) {
+  setUsername(username: string): void {
     this._username.set(username);
   }
 
-  clearUsername() {
-    this._username.set('');
+  setRooms(rooms: ChatRoom[]): void {
+    this._chatRooms.set(rooms);
   }
 
-  setRooms(rooms: ChatRoom[]) {
-    this._rooms.set(rooms);
+  selectRoomById(roomId: string): void {
+    this.selectRoom(this.getChatRoomOrDefault(roomId));
   }
 
-  selectRoomById(roomId: string) {
-    let chatRoom = this.getChatRoomOrDefault(roomId);
-    this.selectRoom(chatRoom)
+  selectRoom(room: ChatRoom): void {
+    this._activeChatRoom.set(room);
+
+    this.ensureRoomExists(this._chatMessages, room.id);
+    this.ensureRoomExists(this._chatRoomUsers, room.id);
   }
 
-  private getChatRoomOrDefault(roomId: string) {
-    let chatRoom = this._rooms()
-      .find(room => room.id === roomId);
-
-    if (chatRoom) return chatRoom;
-    return {
-      id: roomId,
-      name: roomId,
-    };
-  }
-
-  selectRoom(room: ChatRoom) {
-    this._activeRoom.set(room);
-    this.updateChatMessages(room);
-    this.updateChatRoomUsers(room);
-  }
-
-  private updateChatRoomUsers(room: ChatRoom) {
-    if (!this._users()[room.id]) {
-      this._users.update(current => ({
-        ...current,
-        [room.id]: []
-      }));
-    }
-  }
-
-  private updateChatMessages(room: ChatRoom) {
-    if (!this._messages()[room.id]) {
-      this._messages.update(current => ({
-        ...current,
-        [room.id]: []
-      }));
-    }
-  }
-
-  addMessage(roomId: string, message: ChatMessageResponse) {
-    this._messages.update(current => ({
+  addMessage(roomId: string, message: ChatMessageResponse): void {
+    this._chatMessages.update(current => ({
       ...current,
       [roomId]: [
         ...(current[roomId] ?? []),
@@ -99,63 +49,57 @@ export class ChatRoomState {
     }));
   }
 
-  setMessages(roomId: string, messages: ChatMessageResponse[]) {
-    this._messages.update(current => ({
-      ...current,
-      [roomId]: messages
-
-    }));
+  getMessages(roomId: string): ChatMessageResponse[] {
+    return this._chatMessages()[roomId] ?? [];
   }
 
-  getMessages(roomId: string) {
-    return this._messages()[roomId] ?? [];
-  }
-
-  clearMessages(roomId: string) {
-    this._messages.update(current => {
-      const copy = {...current};
-      delete copy[roomId];
-      return copy;
-    });
-  }
-
-  setUsers(roomId: string, users: string[]) {
-    this._users.update(current => ({
-      ...current,
-      [roomId]: users
-    }));
-  }
-
-  addUser(roomId: string, username: string) {
-    this._users.update(current => ({
-      ...current,
-      [roomId]: [
-        ...(current[roomId] ?? []),
-        username
-      ]
-    }));
-  }
-
-  removeUser(roomId: string, username: string) {
-    this._users.update(current => ({
-      ...current,
-      [roomId]:
-        (current[roomId] ?? [])
-          .filter(user => user !== username)
-    }));
-
+  setUsers(roomId: string, users: string[]): void {
+    this.updateMap(this._chatRoomUsers, roomId, users);
   }
 
   getRoomUsers(roomId: string): string[] {
-    return this._users()[roomId] ?? [];
+    return this._chatRoomUsers()[roomId] ?? [];
   }
 
-  clear() {
+  clear(): void {
     this._username.set('');
-    this._rooms.set([]);
-    this._activeRoom.set(null);
-    this._messages.set({});
-    this._users.set({});
+    this._chatRooms.set([]);
+    this._activeChatRoom.set(null);
+    this._chatMessages.set({});
+    this._chatRoomUsers.set({});
+  }
+
+  private getChatRoomOrDefault(roomId: string): ChatRoom {
+    return this._chatRooms().find(room => room.id === roomId) ?? {
+      id: roomId,
+      name: roomId
+    };
+  }
+
+  private ensureRoomExists<T>(state: WritableSignal<Record<string, T[]>>,
+                              roomId: string
+  ): void {
+    state.update(current => {
+      if (current[roomId]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [roomId]: []
+      };
+    });
+  }
+
+  private updateMap<T>(
+    state: WritableSignal<Record<string, T>>,
+    key: string,
+    value: T
+  ): void {
+    state.update(current => ({
+      ...current,
+      [key]: value
+    }));
   }
 
 }

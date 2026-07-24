@@ -16,7 +16,7 @@ export class RoomList {
   private readonly chatService = inject(ChatService);
   private readonly chatRoomState = inject(ChatRoomState);
 
-  readonly rooms = this.chatRoomState.rooms;
+  readonly rooms = this.chatRoomState.chatRooms;
   readonly activeRoom = this.chatRoomState.activeRoom;
   readonly username = this.chatRoomState.username
 

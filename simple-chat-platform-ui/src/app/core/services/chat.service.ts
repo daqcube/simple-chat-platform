@@ -84,7 +84,7 @@ export class ChatService {
       throw new Error('STOMP connection not established');
     }
     const key = this.usersKey(roomId);
-    this.unsubscribe(key)
+    this.unsubscribe(this.usersKey(roomId))
     const subscription = this.client?.subscribe(
       `${environment.websocket.subscription.rooms}/${roomId}/users`,
       message => {
@@ -120,7 +120,6 @@ export class ChatService {
 
   leaveRoom(roomId: string, username: string): void {
     this.client?.publish({
-
       destination:
       environment.websocket.destination.leave,
 

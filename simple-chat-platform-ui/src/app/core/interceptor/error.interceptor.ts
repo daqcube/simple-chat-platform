@@ -9,7 +9,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const message =
         backendError?.message ??
         (error.status === 0
-          ? 'Unable to reach the chat server. Is the backend running?'
+          ? 'We are having trouble connecting to our chat platform right now.'
           : `Request failed (${error.status})`);
 
       console.error('[HTTP error]', message, backendError?.details ?? '');
