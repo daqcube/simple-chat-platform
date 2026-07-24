@@ -6,7 +6,7 @@ import {ChatMessageResponse} from '../../../core/models/chat-message-response.mo
 @Injectable({
   providedIn: 'root'
 })
-export class ChatState {
+export class ChatRoomState {
   private readonly _username = signal<string>('');
   private readonly _rooms = signal<ChatRoom[]>([]);
   private readonly _activeRoom = signal<ChatRoom | null>(null);
@@ -49,90 +49,47 @@ export class ChatState {
     this._rooms.set(rooms);
   }
 
-  addRoom(room: ChatRoom) {
-    this._rooms.update(current => [
-      ...current,
-      room
-
-    ]);
-
+  selectRoomById(roomId: string) {
+    let chatRoom = this.getChatRoomOrDefault(roomId);
+    this.selectRoom(chatRoom)
   }
 
-  selectRoomById(roomId: string) {
-
-    const existing = this._rooms()
+  private getChatRoomOrDefault(roomId: string) {
+    let chatRoom = this._rooms()
       .find(room => room.id === roomId);
 
-    if (existing) {
-      this._activeRoom.set(existing);
-
-    } else {
-      this._activeRoom.set({
-        id: roomId,
-        name: roomId,
-      });
-
-    }
-
-
-    if (!this._messages()[roomId]) {
-
-      this._messages.update(current => ({
-
-        ...current,
-
-        [roomId]: []
-
-      }));
-
-    }
-
-
-    if (!this._users()[roomId]) {
-
-      this._users.update(current => ({
-
-        ...current,
-
-        [roomId]: []
-
-      }));
-
-    }
-
+    if (chatRoom) return chatRoom;
+    return {
+      id: roomId,
+      name: roomId,
+    };
   }
 
   selectRoom(room: ChatRoom) {
     this._activeRoom.set(room);
-    if (!this._messages()[room.id]) {
+    this.updateChatMessages(room);
+    this.updateChatRoomUsers(room);
+  }
 
+  private updateChatRoomUsers(room: ChatRoom) {
+    if (!this._users()[room.id]) {
+      this._users.update(current => ({
+        ...current,
+        [room.id]: []
+      }));
+    }
+  }
+
+  private updateChatMessages(room: ChatRoom) {
+    if (!this._messages()[room.id]) {
       this._messages.update(current => ({
         ...current,
         [room.id]: []
       }));
     }
-
-    if (!this._users()[room.id]) {
-      this._users.update(current => ({
-
-        ...current,
-
-        [room.id]: []
-
-      }));
-    }
-
   }
 
-  clearRoom() {
-    this._activeRoom.set(null);
-  }
-
-  addMessage(
-    roomId: string,
-    message: ChatMessageResponse
-  ) {
-
+  addMessage(roomId: string, message: ChatMessageResponse) {
     this._messages.update(current => ({
       ...current,
       [roomId]: [
@@ -140,92 +97,51 @@ export class ChatState {
         message
       ]
     }));
-
   }
 
-
-  setMessages(
-    roomId: string,
-    messages: ChatMessageResponse[]
-  ) {
-
+  setMessages(roomId: string, messages: ChatMessageResponse[]) {
     this._messages.update(current => ({
-
       ...current,
-
       [roomId]: messages
 
     }));
-
   }
-
 
   getMessages(roomId: string) {
     return this._messages()[roomId] ?? [];
   }
 
-
   clearMessages(roomId: string) {
     this._messages.update(current => {
-
       const copy = {...current};
-
       delete copy[roomId];
-
       return copy;
-
     });
-
   }
 
-  setUsers(
-    roomId: string,
-    users: string[]
-  ) {
-
+  setUsers(roomId: string, users: string[]) {
     this._users.update(current => ({
-
       ...current,
-
       [roomId]: users
-
     }));
-
   }
 
-  addUser(
-    roomId: string,
-    username: string
-  ) {
-
+  addUser(roomId: string, username: string) {
     this._users.update(current => ({
-
       ...current,
-
       [roomId]: [
-
         ...(current[roomId] ?? []),
-
         username
-
       ]
-
     }));
-
   }
 
-  removeUser(
-    roomId: string,
-    username: string
-  ) {
-
+  removeUser(roomId: string, username: string) {
     this._users.update(current => ({
       ...current,
-
       [roomId]:
         (current[roomId] ?? [])
           .filter(user => user !== username)
-
     }));
 
   }

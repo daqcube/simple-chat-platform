@@ -4,7 +4,7 @@ import SockJS from 'sockjs-client';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {ChatState} from '../../features/chat/state/chat.state';
+import {ChatRoomState} from '../../features/chat/state/chat-room.state';
 import {JoinResponse} from '../models/join-response.model';
 import {JoinRequest} from '../models/join-request.model';
 import {ChatMessageResponse} from '../models/chat-message-response.model';
@@ -16,13 +16,19 @@ export class ChatService {
   private client?: Client;
   subscriptions = new Map<string, StompSubscription>();
   readonly connected = signal(false);
-  readonly chatState = inject(ChatState)
+  readonly chatState = inject(ChatRoomState)
 
   constructor(private readonly http: HttpClient) {
   }
 
   join(request: JoinRequest): Observable<JoinResponse> {
     return this.http.post<JoinResponse>(`${environment.api.chat}/join`, request);
+  }
+
+  getChatRooms(): Observable<ChatRoom[]> {
+    return this.http.get<ChatRoom[]>(
+      `${environment.api.chat}/rooms`
+    );
   }
 
   connect(): Promise<void> {
@@ -39,19 +45,15 @@ export class ChatService {
           this.connected.set(true);
           resolve();
         },
-
         onDisconnect: () => {
           this.connected.set(false);
         },
-
         onWebSocketClose: () => {
           this.connected.set(false);
         }
       });
       this.client.activate();
-
     });
-
   }
 
   subscribeToRoom(roomId: string) {
@@ -63,30 +65,25 @@ export class ChatService {
     if (!this.client?.connected) {
       throw new Error('STOMP connection not established');
     }
-    const key = `messages:${roomId}`;
-    this.unsubscribe(key)
+    const messageKey = this.messageKey(roomId);
+    this.unsubscribe(messageKey)
 
     const subscription = this.client?.subscribe(
       `${environment.websocket.subscription.rooms}/${roomId}/messages`,
       message => {
-        console.log(
-          'Message received:',
-
-          message.body
-        );
         const response: ChatMessageResponse = JSON.parse(message.body);
+        console.log('Message received:', response);
         this.chatState.addMessage(roomId, response);
       }
     );
-    this.subscriptions.set(key, subscription);
-
+    this.subscriptions.set(messageKey, subscription);
   }
 
   private subscribeToUsers(roomId: string) {
     if (!this.client?.connected) {
       throw new Error('STOMP connection not established');
     }
-    const key = `users:${roomId}`;
+    const key = this.usersKey(roomId);
     this.unsubscribe(key)
     const subscription = this.client?.subscribe(
       `${environment.websocket.subscription.rooms}/${roomId}/users`,
@@ -101,8 +98,8 @@ export class ChatService {
   }
 
   unsubscribeFromRoom(roomId: string) {
-    this.unsubscribe(`users:${roomId}`);
-    this.unsubscribe(`messages:${roomId}`);
+    this.unsubscribe(this.usersKey(roomId));
+    this.unsubscribe(this.messageKey(roomId));
   }
 
   sendMessage(request: ChatMessageRequest): void {
@@ -149,9 +146,12 @@ export class ChatService {
     this.connected.set(false);
   }
 
-  getRooms(): Observable<ChatRoom[]> {
-    return this.http.get<ChatRoom[]>(
-      `${environment.api.chat}/rooms`
-    );
+
+  private messageKey(roomId: string) {
+    return `messages:${roomId}`;
+  }
+
+  private usersKey(roomId: string) {
+    return `users:${roomId}`;
   }
 }

@@ -1,8 +1,9 @@
 import {Component, computed, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {ChatRoom} from '../../../../core/models/chat-room.model';
-import {ChatState} from '../../state/chat.state';
+import {ChatRoomState} from '../../state/chat-room.state';
 import {ChatService} from '../../../../core/services/chat.service';
+import {JoinRequest} from '../../../../core/models/join-request.model';
 
 @Component({
   selector: 'app-room-list',
@@ -13,46 +14,46 @@ import {ChatService} from '../../../../core/services/chat.service';
 export class RoomList {
   private readonly router = inject(Router);
   private readonly chatService = inject(ChatService);
-  private readonly chatState = inject(ChatState);
+  private readonly chatRoomState = inject(ChatRoomState);
 
-  readonly rooms = this.chatState.rooms;
-  readonly activeRoom = this.chatState.activeRoom;
-  readonly username = this.chatState.username
+  readonly rooms = this.chatRoomState.rooms;
+  readonly activeRoom = this.chatRoomState.activeRoom;
+  readonly username = this.chatRoomState.username
 
   readonly users = computed(() =>
-    this.chatState.getRoomUsers(<string>this.activeRoom()?.id)
+    this.chatRoomState.getRoomUsers(<string>this.activeRoom()?.id)
   );
 
-  select(room: ChatRoom): void {
+  selectRoom(room: ChatRoom): void {
     if (this.activeRoom()?.id === room.id) {
       return;
     }
 
     const previous = this.activeRoom();
     if (previous) {
-      this.chatService.leaveRoom(previous.id, this.chatState.username());
+      this.chatService.leaveRoom(previous.id, this.chatRoomState.username());
       this.chatService.unsubscribeFromRoom(previous.id);
     }
 
     this.chatService.subscribeToRoom(room.id);
+    this.chatRoomState.selectRoom(room);
 
-    this.chatState.selectRoom(room);
-
-    this.chatService.join({
+    const request: JoinRequest = {
       roomId: room.id,
-      username: this.chatState.username()
-    }).subscribe({
+      username: this.chatRoomState.username()
+    }
+
+    this.chatService.join(request).subscribe({
       next: () => {
         this.router.navigate(['/chat/rooms', room.id]).then(r => r);
       },
       error: err => {
         console.error('Failed to join room', err);
       }
-
     });
   }
 
   getUsers(room: ChatRoom) {
-    return this.chatState.getRoomUsers(room.id)
+    return this.chatRoomState.getRoomUsers(room.id)
   }
 }

@@ -5,11 +5,11 @@
   </aside>
 
   <main class="conversation">
-    @if (chatState.activeRoom(); as room) {
+    @if (chatState.activeRoom(); ) {
       <router-outlet></router-outlet>
     } @else {
       <div class="empty-state">
-        <h3>Welcome 👋</h3>
+        <h3>Welcome </h3>
         <p>Select a chat room to start chatting.</p>
       </div>
     }

@@ -32,6 +32,7 @@ The backend provides:
 Handles REST operations:
 
 - Joining chat rooms
+- Listing chat rooms
 
 ### ChatMessageController
 

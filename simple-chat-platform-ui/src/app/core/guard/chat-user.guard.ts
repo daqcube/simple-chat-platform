@@ -1,9 +1,9 @@
 import {inject} from '@angular/core';
 import {CanActivateFn, Router} from '@angular/router';
-import {ChatState} from '../../features/chat/state/chat.state';
+import {ChatRoomState} from '../../features/chat/state/chat-room.state';
 
 export const chatUserGuard: CanActivateFn = () => {
-  const chatState = inject(ChatState);
+  const chatState = inject(ChatRoomState);
   const router = inject(Router);
   const username = chatState.username();
 
