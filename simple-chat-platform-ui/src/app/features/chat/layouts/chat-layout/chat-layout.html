@@ -1,6 +1,17 @@
 <div class="chat-layout">
 
   <aside class="sidebar" aria-label="Chat rooms">
+    <div class="sidebar-header">
+      <h3>Chat Rooms</h3>
+      <button
+        type="button"
+        class="leave-button"
+        (click)="leavePlatForm()"
+        aria-label="Logout from chat">
+        Leave
+      </button>
+
+    </div>
     <app-room-list/>
   </aside>
 

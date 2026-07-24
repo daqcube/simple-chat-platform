@@ -3,7 +3,7 @@ import {ChatService} from '../../../../core/services/chat.service';
 import {RoomList} from '../../components/room-list/room-list';
 import {Users} from '../../components/users/users';
 import {ChatRoomState} from '../../state/chat-room.state';
-import {RouterOutlet} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-chat-layout',
@@ -18,6 +18,7 @@ import {RouterOutlet} from '@angular/router';
 export class ChatLayout implements OnInit {
   readonly chatState = inject(ChatRoomState);
   readonly chatService = inject(ChatService);
+  readonly router = inject(Router)
 
   readonly username = this.chatState.username;
   readonly activeRoom = this.chatState.activeRoom;
@@ -37,5 +38,16 @@ export class ChatLayout implements OnInit {
         this.chatState.setRooms(rooms);
       });
 
+  }
+
+  leavePlatForm() {
+    const room = this.chatState.activeRoom();
+    const username = this.chatState.username();
+    if (room && username) {
+      this.chatService.leaveRoom(room.id, username);
+    }
+    this.chatService.disconnect();
+    this.chatState.clear();
+    this.router.navigate(['/join']).then(r => r);
   }
 }
