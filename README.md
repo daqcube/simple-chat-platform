@@ -111,6 +111,29 @@ See the frontend documentation:
 
 ---
 
+# API Testing (Postman)
+
+A Postman collection is provided to test the backend REST APIs.
+
+Download/import the collection:
+
+[Postman Collection](postman/simple-chat-platform.postman_collection.json)
+
+The collection includes:
+
+- Join chat room
+- Retrieve available chat rooms
+
+## Import Collection
+
+1. Open Postman.
+2. Click **Import**.
+3. Select the Postman collection link above.
+4. Start the backend service.
+5. Execute the requests.
+
+---
+
 # Application Flow
 
 1. User enters a username.
